@@ -23,8 +23,8 @@ class SFTConfig:
 
     # LoRA
     lora_rank: int = 32  # Rank for LoRA adapters
-    lora_alpha: int = 16
-    lora_dropout: float = 0.05
+    # Note: lora_alpha and lora_dropout are not currently supported by Tinker API
+    # The API only accepts the rank parameter
 
     # Training objective
     train_on_what: str = "LAST_ASSISTANT_MESSAGE"  # Most efficient for chat
@@ -49,8 +49,8 @@ class RLConfig:
 
     # LoRA (should match SFT)
     lora_rank: int = 32
-    lora_alpha: int = 16
-    lora_dropout: float = 0.05
+    # Note: lora_alpha and lora_dropout are not currently supported by Tinker API
+    # The API only accepts the rank parameter
 
     # RL Algorithm
     loss_fn: str = "importance_sampling"  # or "ppo"

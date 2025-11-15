@@ -58,12 +58,10 @@ def train_rl(config, sft_checkpoint_path: str):
 
     # Load SFT checkpoint as initial policy
     print(f"\n📦 Loading SFT checkpoint: {sft_checkpoint_path}")
-    training_client = service_client.create_training_client(
+    training_client = service_client.create_lora_training_client(
         base_model=config.base_model_name,
         load_checkpoint_path=sft_checkpoint_path,  # Start from SFT weights
-        lora_rank=config.lora_rank,
-        lora_alpha=config.lora_alpha,
-        lora_dropout=config.lora_dropout,
+        rank=config.lora_rank,
     )
 
     # Get tokenizer and renderer

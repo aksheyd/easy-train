@@ -42,14 +42,12 @@ def get_large_model_config():
             model_name="meta-llama/Llama-3.2-8B",
             batch_size=16,  # Smaller batch size for larger model
             lora_rank=64,  # Higher rank for larger model
-            lora_alpha=32,
             num_epochs=2,
             log_path="logs/large/sft",
         ),
         "rl": RLConfig(
             base_model_name="meta-llama/Llama-3.2-8B",
             lora_rank=64,
-            lora_alpha=32,
             groups_per_batch=16,  # Smaller batch size
             num_steps=300,
             log_path="logs/large/rl",

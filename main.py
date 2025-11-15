@@ -83,7 +83,7 @@ Examples:
 
     args = parser.parse_args()
 
-    # Load environment variables (TINKER_TOKEN, HF_TOKEN, etc.)
+    # Load environment variables (TINKER_API_KEY, HF_TOKEN, etc.)
     load_dotenv()
 
     print("=" * 60)

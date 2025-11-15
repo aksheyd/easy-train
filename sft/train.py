@@ -51,11 +51,9 @@ def train_sft(config):
 
     # Create training client with LoRA configuration
     print(f"\n📦 Loading model: {config.model_name}")
-    training_client = service_client.create_training_client(
+    training_client = service_client.create_lora_training_client(
         base_model=config.model_name,
-        lora_rank=config.lora_rank,
-        lora_alpha=config.lora_alpha,
-        lora_dropout=config.lora_dropout,
+        rank=config.lora_rank,
     )
 
     # Get tokenizer and renderer

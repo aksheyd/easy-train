@@ -24,16 +24,16 @@ pip install -r requirements.txt
 
 # Setup environment variables
 cp .env.example .env
-# Edit .env and add your TINKER_TOKEN
+# Edit .env and add your TINKER_API_KEY
 ```
 
 ### 2. Get Your Tinker Token
 
 1. Sign up at [https://www.tinker.so/](https://www.tinker.so/)
-2. Get your API token from the dashboard
+2. Get your API key from the dashboard
 3. Add it to your `.env` file:
    ```
-   TINKER_TOKEN=your_token_here
+   TINKER_API_KEY=your_api_key_here
    ```
 
 ### 3. Prepare Data
@@ -234,7 +234,6 @@ SFTConfig(
     model_name="meta-llama/Llama-3.2-8B",
     batch_size=16,  # Reduce for larger model
     lora_rank=64,   # Increase for larger model
-    lora_alpha=32,
 )
 ```
 
