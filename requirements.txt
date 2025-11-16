@@ -1,0 +1,3 @@
+tinker-sdk
+python-dotenv
+numpy

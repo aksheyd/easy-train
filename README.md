@@ -1,306 +1,147 @@
-# Tinker Post-Training Pipeline
+# Easy Train - Simple Fine-Tuning with Tinker
 
-A complete, educational pipeline for post-training language models using [Tinker](https://www.tinker.so/) by Thinking Machines Lab. This implementation demonstrates the fundamentals of modern post-training techniques including Supervised Fine-Tuning (SFT) and Reinforcement Learning (RL) with preference optimization.
-
-## Features
-
-- **Supervised Fine-Tuning (SFT)**: Fine-tune pretrained models on conversational data with LoRA adapters
-- **Reinforcement Learning (RL)**: Improve models using importance sampling with preference-based rewards (GRPO)
-- **Modal Deployment**: Deploy trained models for serverless inference with automatic scaling
-- **Educational Focus**: Extensive comments and documentation explaining post-training fundamentals
-- **Flexible Configuration**: Three preset configurations (tiny, quick, full) plus customizable options
+The simplest way to fine-tune an LLM. Just put your JSONL file in the `data/` folder and run!
 
 ## Quick Start
 
-### 1. Installation
+### 1. Install Dependencies
 
 ```bash
-# Clone repository
-git clone <repo-url>
-cd easy-train
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Setup environment variables
-cp .env.example .env
-# Edit .env and add your TINKER_API_KEY
+pip install tinker-sdk
 ```
 
-### 2. Get Your Tinker Token
+### 2. Set Your API Key
 
-1. Sign up at [https://www.tinker.so/](https://www.tinker.so/)
-2. Get your API key from the dashboard
-3. Add it to your `.env` file:
-   ```
-   TINKER_API_KEY=your_api_key_here
-   ```
+```bash
+export TINKER_API_KEY=your_key_here
+```
 
-### 3. Prepare Data
+Or create a `.env` file:
+```
+TINKER_API_KEY=your_key_here
+```
 
-The pipeline includes example conversational data at `examples/example_data.jsonl`. You can use this to test the pipeline, or create your own JSONL file with this format:
+### 3. Prepare Your Data
+
+Put a JSONL file in the `data/` folder with this format:
 
 ```jsonl
-{"messages": [{"role": "user", "content": "Hello!"}, {"role": "assistant", "content": "Hi! How can I help?"}]}
+{"messages": [{"role": "user", "content": "Hello!"}, {"role": "assistant", "content": "Hi there!"}]}
 {"messages": [{"role": "user", "content": "Explain AI."}, {"role": "assistant", "content": "AI is..."}]}
 ```
 
-Validate your data:
-
-```bash
-python main.py --mode validate --data examples/example_data.jsonl
-```
+We've included an example file at `data/example.jsonl` to get you started.
 
 ### 4. Run Training
 
 ```bash
-# Quick experiment (recommended for learning)
-python main.py --mode all --config quick
-
-# Full training
-python main.py --mode all --config full
-
-# Tiny test (for debugging)
-python main.py --mode all --config tiny
+python train.py
 ```
 
-### 5. Deploy to Modal (Optional)
+That's it! The script will:
+1. **SFT (Supervised Fine-Tuning)**: Train the model to replicate your assistant responses
+2. **RL (Reinforcement Learning)**: Improve the model using a simple reward function
 
-After training completes, you can deploy your model:
+## What This Does
 
-```bash
-# Install Modal
-pip install modal
+### Supervised Fine-Tuning (SFT)
+- Trains the model to predict assistant responses
+- Only trains on the last assistant message (more efficient)
+- Uses cross-entropy loss (standard language modeling)
 
-# Setup Modal token
-modal token new
+### Reinforcement Learning (RL)
+- Generates multiple responses per prompt
+- Rewards better responses (longer, well-structured)
+- Uses importance sampling to update the policy
 
-# Deploy the generated app
-modal deploy modal_app.py
+## Customization
 
-# Test with the generated client
-python modal_client.py
-```
-
-## Architecture
-
-### Project Structure
-
-```
-tinker-posttraining/
-├── main.py                     # Main orchestrator script
-├── requirements.txt            # Python dependencies
-├── .env.example               # Environment variable template
-├── README.md                  # This file
-│
-├── config/                    # Configuration system
-│   ├── base_config.py        # Configuration dataclasses
-│   └── default_configs.py    # Preset configurations
-│
-├── data/                      # Data preparation
-│   ├── prepare.py            # JSONL validation & utilities
-│   └── builders.py           # Dataset builder wrappers
-│
-├── sft/                       # Supervised fine-tuning
-│   └── train.py              # SFT training loop
-│
-├── rl/                        # Reinforcement learning
-│   ├── train.py              # RL training loop
-│   ├── environments.py       # Preference-based environments
-│   └── rewards.py            # Reward functions
-│
-├── inference/                 # Inference and deployment
-│   ├── download.py           # Download weights from Tinker
-│   ├── merge_adapter.py      # Merge LoRA with base model
-│   └── modal_deploy.py       # Modal deployment script
-│
-├── utils/                     # Utilities
-│   ├── checkpoint_utils.py   # Checkpoint management
-│   └── logging_utils.py      # Logging and metrics
-│
-└── examples/                  # Examples and samples
-    ├── example_data.jsonl    # Sample conversational data
-    └── example_configs.py    # Example configuration presets
-```
-
-### Training Pipeline
-
-#### SFT Phase
-1. Loads pretrained model (e.g., Llama 3.2 1B)
-2. Applies LoRA for parameter-efficient fine-tuning
-3. Trains on last assistant message only (most efficient)
-4. Saves checkpoints to Tinker
-
-#### RL Phase
-1. Loads SFT checkpoint as initial policy
-2. Generates multiple responses per prompt (GRPO)
-3. Computes preference-based rewards
-4. Updates policy using importance sampling
-5. Saves final checkpoint
-
-#### Deployment
-1. Downloads trained LoRA adapter
-2. Merges with base model for faster inference
-3. Deploys to Modal for serverless scaling
-
-## Usage
-
-### Running Individual Stages
-
-```bash
-# Run only SFT
-python main.py --mode sft --config quick
-
-# Run only RL (requires SFT checkpoint)
-python main.py --mode rl --sft-checkpoint tinker://...
-
-# Deploy existing checkpoint
-python main.py --mode deploy --checkpoint tinker://...
-```
-
-### Custom Data
-
-```bash
-# Use your own JSONL file
-python main.py --mode all --config quick --data my_conversations.jsonl
-```
-
-### Configuration Presets
-
-1. **Tiny** (`--config tiny`): Minimal training for quick testing
-   - Batch size: 8
-   - Epochs: 1
-   - RL steps: 10
-
-2. **Quick** (`--config quick`): Good for experimentation
-   - Batch size: 32
-   - Epochs: 1
-   - RL steps: 100
-
-3. **Full** (`--config full`): Production-quality training
-   - Batch size: 64
-   - Epochs: 3
-   - RL steps: 500
-
-4. **Custom**: Edit `config/base_config.py` for full control
-
-## Educational Notes
-
-This repository is designed for learning post-training fundamentals:
-
-### Why LoRA?
-- Parameter-efficient fine-tuning uses only ~1% of model parameters
-- Enables training large models on consumer hardware
-- Can be merged with base model for deployment
-
-### Why train on last assistant message only?
-- Prevents overfitting to context (user/system messages)
-- Focuses compute on what matters: output quality
-- Standard practice for chat model fine-tuning
-
-### Why importance sampling?
-- Simpler than PPO, excellent for beginners
-- Direct policy gradient with advantage weighting
-- Good baseline for RL from human feedback (RLHF)
-
-### Why GRPO (Group Relative Policy Optimization)?
-- Centering rewards within groups stabilizes training
-- Removes absolute reward scale (only relative matters)
-- More robust to reward function design
-
-### Why RL after SFT?
-- SFT teaches language and basic capabilities
-- RL aligns behavior with preferences
-- Together they produce high-quality aligned models
-
-## Advanced Topics
-
-### Using HuggingFace Datasets
+Edit the `CONFIG` dictionary in `train.py`:
 
 ```python
-# In config/base_config.py or custom config
-SFTConfig(
-    dataset_type="huggingface",
-    data_path="HuggingFaceH4/no_robots",
-    # ... other params
-)
+CONFIG = {
+    # Model settings
+    "model_name": "meta-llama/Llama-3.2-1B",  # Change model here
+    "lora_rank": 32,  # Higher = more parameters
+
+    # SFT settings
+    "sft_learning_rate": 5e-4,
+    "sft_steps": 100,
+    "sft_batch_size": 4,
+
+    # RL settings
+    "rl_learning_rate": 1e-5,
+    "rl_steps": 50,
+    "rl_num_samples": 4,
+    "rl_max_tokens": 200,
+}
 ```
 
-### Training Larger Models
+### Custom Reward Function
+
+Edit the `compute_simple_reward()` function in `train.py` to customize how RL evaluates responses:
 
 ```python
-# For Llama 3.2 8B
-SFTConfig(
-    model_name="meta-llama/Llama-3.2-8B",
-    batch_size=16,  # Reduce for larger model
-    lora_rank=64,   # Increase for larger model
-)
+def compute_simple_reward(response_text: str) -> float:
+    # Your custom logic here!
+    # Higher reward = better response
+    return some_score
 ```
 
-### Using PPO Instead of Importance Sampling
+## Available Models
 
-```python
-# In config
-RLConfig(
-    loss_fn="ppo",
-    learning_rate=3e-5,  # Slightly lower for PPO
-)
+See the [Tinker docs](https://docs.tinker.so/) for available models. Some popular options:
+
+- `meta-llama/Llama-3.2-1B` (fastest, smallest)
+- `meta-llama/Llama-3.2-3B`
+- `meta-llama/Llama-3.1-8B`
+- `Qwen/Qwen3-8B`
+- `Qwen/Qwen3-30B-A3B` (MoE, efficient)
+
+## Project Structure
+
+```
+easy-train/
+├── train.py           # Main training script (only file you need!)
+├── data/              # Put your JSONL files here
+│   └── example.jsonl  # Example data
+└── README.md          # This file
 ```
 
-### Uploading to HuggingFace
+## How It Works
 
-```python
-InferenceConfig(
-    upload_to_hf=True,
-    hf_repo_name="your-username/your-model-name",
-)
-```
+This project uses **only Tinker primitives** - no complicated libraries or abstractions:
 
-## Troubleshooting
+- `tinker.ServiceClient()` - Connect to Tinker
+- `create_lora_training_client()` - Create a trainable model with LoRA
+- `forward_backward()` - Compute gradients
+- `optim_step()` - Update weights
+- `save_weights_for_sampler()` - Save checkpoint
+- `create_sampling_client()` - Generate text
 
-### Out of Memory
-- Reduce `batch_size` in config
-- Reduce `max_length` (sequence length)
-- Use smaller model (e.g., Llama-3.2-1B instead of 8B)
+Everything is in one readable file (`train.py`) so you can understand and modify it easily.
 
-### Low Rewards in RL
-- Check reward function (are rewards meaningful?)
-- Increase `learning_rate` slightly
-- Generate more rollouts per batch
-- Try different reward types
+## Tips
 
-### Modal Deployment Fails
-- Ensure `modal token new` is set up
-- Check GPU type is available in your region
-- Verify HuggingFace token for private models
+### Out of Memory?
+- Use a smaller model (e.g., `Llama-3.2-1B`)
+- Reduce `sft_batch_size`
+- Reduce `rl_num_samples`
 
-### JSONL Validation Errors
-- Ensure each line is valid JSON
-- Check for required fields: "messages"
-- Verify role is one of: "system", "user", "assistant"
-- Use `--mode validate` to check your data
+### Training Too Slow?
+- Reduce `sft_steps` and `rl_steps`
+- Use fewer examples (set `max_examples` in CONFIG)
 
-## Resources
+### Want Better RL?
+- Customize the reward function in `compute_simple_reward()`
+- Increase `rl_num_samples` (more diversity)
+- Increase `rl_steps` (more training)
+
+## Learn More
 
 - [Tinker Documentation](https://docs.tinker.so/)
-- [Tinker Cookbook](https://github.com/thinking-machines/tinker-cookbook)
-- [LoRA Paper](https://arxiv.org/abs/2106.09685)
-- [GRPO Algorithm](https://arxiv.org/abs/2402.03300)
-- [Modal Documentation](https://modal.com/docs)
-- [Llama 3.2 Models](https://huggingface.co/meta-llama)
-
-## Contributing
-
-Contributions are welcome! This project is designed to be educational, so:
-- Add more educational comments
-- Improve documentation
-- Add more example configurations
-- Share your training results
+- [Tinker Cookbook](https://github.com/thinking-machines/tinker-cookbook) (for advanced features)
 
 ## License
 
 MIT
-
-## Acknowledgments
-
-Built with [Tinker](https://www.tinker.so/) by Thinking Machines Lab - making post-training accessible to everyone.
