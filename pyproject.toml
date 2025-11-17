@@ -24,5 +24,6 @@ dependencies = [
     "scipy",
     "vllm",
     "modal",
-    "peft"
+    "peft",
+    "mlx_lm"
 ]
