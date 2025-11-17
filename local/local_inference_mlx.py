@@ -63,7 +63,6 @@ def main():
                     max_tokens=args.max_tokens,
                     verbose=True,
                 )
-                print(f"\nAssistant: {response}\n")
 
             except KeyboardInterrupt:
                 print("\nExiting...")
