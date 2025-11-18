@@ -7,12 +7,12 @@ import asyncio
 from datetime import datetime
 
 import chz
-from tinker_cookbook.tinker_cookbook import cli_utils, model_info, renderers
-from tinker_cookbook.tinker_cookbook.eval.evaluators import EvaluatorBuilder
-from tinker_cookbook.tinker_cookbook.recipes.chat_sl import chat_datasets
+from tinker_cookbook import cli_utils, model_info, renderers
+from tinker_cookbook.eval.evaluators import EvaluatorBuilder
+from tinker_cookbook.recipes.chat_sl import chat_datasets
 import train.sft.chat_sl as train
-from tinker_cookbook.tinker_cookbook.supervised.data import FromConversationFileBuilder
-from tinker_cookbook.tinker_cookbook.supervised.types import (
+from tinker_cookbook.supervised.data import FromConversationFileBuilder
+from tinker_cookbook.supervised.types import (
     ChatDatasetBuilder,
     ChatDatasetBuilderCommonConfig,
 )
@@ -93,9 +93,7 @@ def get_infrequent_evaluator_builders(
     if inline_evals is None:
         return []
     elif inline_evals == "inspect":
-        from tinker_cookbook.tinker_cookbook.eval.inspect_evaluators import (
-            InspectEvaluatorBuilder,
-        )
+        from tinker_cookbook.eval.inspect_evaluators import InspectEvaluatorBuilder
 
         builder = InspectEvaluatorBuilder(
             tasks=["inspect_evals/gsm8k", "inspect_evals/ifeval"],

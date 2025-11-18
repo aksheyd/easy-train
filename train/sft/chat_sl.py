@@ -16,23 +16,23 @@ from dataclasses import dataclass
 import chz
 import tinker
 from tinker.lib.public_interfaces import APIFuture
-from tinker_cookbook.tinker_cookbook import checkpoint_utils
-from tinker_cookbook.tinker_cookbook.display import colorize_example
-from tinker_cookbook.tinker_cookbook.eval.evaluators import (
+from tinker_cookbook import checkpoint_utils
+from tinker_cookbook.display import colorize_example
+from tinker_cookbook.eval.evaluators import (
     Evaluator,
     EvaluatorBuilder,
     SamplingClientEvaluator,
     TrainingClientEvaluator,
 )
-from tinker_cookbook.tinker_cookbook.supervised.common import compute_mean_nll
-from tinker_cookbook.tinker_cookbook.supervised.nll_evaluator import NLLEvaluator
-from tinker_cookbook.tinker_cookbook.supervised.types import SupervisedDatasetBuilder
-from tinker_cookbook.tinker_cookbook.tokenizer_utils import get_tokenizer
-from tinker_cookbook.tinker_cookbook.utils import ml_log
-from tinker_cookbook.tinker_cookbook.utils.lr_scheduling import (
+from tinker_cookbook.supervised.common import compute_mean_nll
+from tinker_cookbook.supervised.nll_evaluator import NLLEvaluator
+from tinker_cookbook.supervised.types import SupervisedDatasetBuilder
+from tinker_cookbook.tokenizer_utils import get_tokenizer
+from tinker_cookbook.utils import ml_log
+from tinker_cookbook.utils.lr_scheduling import (
     compute_schedule_lr_multiplier,
 )
-from tinker_cookbook.tinker_cookbook.utils.misc_utils import timed
+from tinker_cookbook.utils.misc_utils import timed
 
 logger = logging.getLogger(__name__)
 
