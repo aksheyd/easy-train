@@ -16,6 +16,9 @@ from tinker_cookbook.supervised.types import (
     ChatDatasetBuilder,
     ChatDatasetBuilderCommonConfig,
 )
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 @chz.chz
