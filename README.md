@@ -2,19 +2,38 @@
 
 How I'm learning post-training.
 
-Currently, I'm using Tinker to run basic SFT via the [no robots dataset](https://huggingface.co/datasets/HuggingFaceH4/no_robots) on [LLaMa 3.1 8B Instruct](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct).
+Currently, I'm using Tinker to run basic SFT via on datasets like no robots and tulu3 on LLaMa-3.1-8B.
 
-Then, I download the sampler weights from Tinker, downloaded the full model, merged the adapter weights, and uploaded the merged model to Hugging Face.
+After training (LoRA rank 32, batch size 128, learning rate 1e-4), I merge the adapter weights with the base model and uploading the merged model to Hugging Face. I'm running inference via 4/8-bit quantized MLX locally and vLLM on Modal on an L4 GPU.
 
-[Merged Model](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots)
+First SFT on No Robots dataset:
 
-[MLX Model](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots-mlx)
-Then, I'm running inference via 4-bit quantized MLX locally and vLLM on Modal on an L4 GPU.
+[llama-3.1-8b-instruct-no-robots](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots)
+
+[llama-3.1-8b-instruct-no-robots-mlx](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots-mlx)
+
+First SFT on Tulu3 dataset:
+
+[llama-3.1-8b-tulu3-sft](https://huggingface.co/aksheyd/llama-3.1-8b-tulu3-sft)
+
+[llama-3.1-8b-tulu3-sft-mlx](https://huggingface.co/aksheyd/llama-3.1-8b-tulu3-sft-mlx)
+
+## Findings
+
+Both my fine-tunes produce gibberish responses. I'm currently trying to figure out if this is due to the training hyperparameters, or the model itself. A simple Hello turns into 1000s of words of the model hinting keyowrds to itself then generating text that exactly matches the dataset.
+
+## Future Work
+
+I want to explore RL (maybe the SFT checkpoint is supposed to be poor alone?).
+
+I want to try PPO + RLHF and GRPO + RLVR to see if I can get a better instruct model and coding model potentially. Obviously, this requires a ton of compute and resources. I am interested in scaling RL and tackle problems like in this [paper](https://arxiv.org/pdf/2511.14617) from Moonshot.
 
 ## Folers
 
+```
 local -> local vLLM setup to test
 modal -> Modal vLLM setup to test
 train -> Tinker training setup
 tinker_cookbook -> Tinker cookbook git submodule
 client.py -> Simple client to test the vLLM server
+```

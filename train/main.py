@@ -23,7 +23,10 @@ if __name__ == "__main__":
         with open(CHECKPOINT_PATH, "r") as f:
             checkpoint_dict = json.load(f)
 
-    sampler_weights_path = checkpoint_dict["sampler_path"]
+    sampler_weights_path = (
+        "tinker://a08001b6-13cf-54ba-9663-1e57bab31f49:train:0/sampler_weights/001580"
+    )
+    # checkpoint_dict["sampler_path"]
     if not os.path.exists("sampler_weights.tar"):
         print("Sampler weights not found, downloading...")
         sc = tinker.ServiceClient()
