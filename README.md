@@ -1,10 +1,8 @@
 # Easy Train
 
-How I'm learning post-training.
+I was using Tinker to run basic SFT via on datasets like no robots and tulu3 on LLaMa-3.1-8B. After training (LoRA rank 32, batch size 128, learning rate 1e-4), I merge the adapter weights with the base model and uploading the merged model to Hugging Face. I'm running inference via 4/8-bit quantized MLX locally and vLLM on Modal on an L4 GPU.
 
-Currently, I'm using Tinker to run basic SFT via on datasets like no robots and tulu3 on LLaMa-3.1-8B.
-
-After training (LoRA rank 32, batch size 128, learning rate 1e-4), I merge the adapter weights with the base model and uploading the merged model to Hugging Face. I'm running inference via 4/8-bit quantized MLX locally and vLLM on Modal on an L4 GPU.
+But not anymore: I ran out of my $150 free credits so now, I'm trying to train on Modal using Unsloth QLora with WanDB for visibility, then will upload weights to Hugging Face.
 
 First SFT on No Robots dataset:
 
