@@ -20,7 +20,9 @@ First SFT on Tulu3 dataset:
 
 ## Findings
 
-Both my fine-tunes produce gibberish responses. I'm currently trying to figure out if this is due to the training hyperparameters, or the model itself. A simple Hello turns into 1000s of words of the model hinting keyowrds to itself then generating text that exactly matches the dataset.
+On extremely short prompts, my fine-tunes produce gibberish responses. I'm currently trying to figure out if this is due to the training hyperparameters, or the model itself. A simple Hello turns into 1000s of words of the model hinting keyowrds to itself then generating text that exactly matches the dataset.
+
+However, on longer prompts, the model seems to be able to generate more coherent responses.
 
 ## Future Work
 

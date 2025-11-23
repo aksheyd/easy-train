@@ -10,7 +10,7 @@ import chz
 from tinker_cookbook import cli_utils, model_info, renderers
 from tinker_cookbook.eval.evaluators import EvaluatorBuilder
 from tinker_cookbook.recipes.chat_sl import chat_datasets
-import train.sft.chat_sl as train
+import post_training.tinker.sft.chat_sl as train
 from tinker_cookbook.supervised.data import FromConversationFileBuilder
 from tinker_cookbook.supervised.types import (
     ChatDatasetBuilder,

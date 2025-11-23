@@ -1,7 +1,7 @@
 import json
 import tarfile
-from train.config import CHECKPOINT_PATH, TRAINING_COMPLETED
-import train.sl_loop
+from post_training.tinker.config import CHECKPOINT_PATH, TRAINING_COMPLETED
+import post_training.tinker.sl_loop
 import chz
 from dotenv import load_dotenv
 import sys
@@ -15,7 +15,7 @@ load_dotenv()
 
 if __name__ == "__main__":
     if not TRAINING_COMPLETED:
-        checkpoint_dict = chz.nested_entrypoint(train.sl_loop.main)
+        checkpoint_dict = chz.nested_entrypoint(post_training.tinker.sl_loop.main)
         TRAINING_COMPLETED = True
         with open(CHECKPOINT_PATH, "w") as f:
             json.dump(checkpoint_dict, f)
