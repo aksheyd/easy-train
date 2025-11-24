@@ -14,7 +14,7 @@ vllm_image = (
     .env({"HF_XET_HIGH_PERFORMANCE": "1"})
 )
 
-MODEL_NAME = "aksheyd/llama-3.1-8b-instruct-no-robots"
+MODEL_NAME = "aksheyd/qwen3-32b-finetome-sft"
 
 hf_cache_vol = modal.Volume.from_name("huggingface-cache", create_if_missing=True)
 vllm_cache_vol = modal.Volume.from_name("vllm-cache", create_if_missing=True)
@@ -31,7 +31,7 @@ VLLM_PORT = 8000
 
 @app.function(
     image=vllm_image,
-    gpu="L4",
+    gpu="H100",
     scaledown_window=15 * MINUTES,
     timeout=10 * MINUTES,
     volumes={
@@ -39,7 +39,7 @@ VLLM_PORT = 8000
         "/root/.cache/vllm": vllm_cache_vol,
         "/root/.cache/lora": lora_cache_vol,
     },
-    secrets=[modal.Secret.from_name("tinker-secret")],
+    secrets=[modal.Secret.from_name("huggingface-secret")],
 )
 @modal.concurrent(max_inputs=4)
 @modal.web_server(port=VLLM_PORT, startup_timeout=10 * MINUTES)

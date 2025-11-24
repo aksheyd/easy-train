@@ -4,17 +4,21 @@ I was using Tinker to run basic SFT via on datasets like no robots and tulu3 on 
 
 But not anymore: I ran out of my $150 free credits so now, I'm trying to train on Modal using Unsloth QLora with WanDB for visibility, then will upload weights to Hugging Face.
 
-First SFT on No Robots dataset:
+## First SFT on No Robots dataset:
 
 [llama-3.1-8b-instruct-no-robots](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots)
 
 [llama-3.1-8b-instruct-no-robots-mlx](https://huggingface.co/aksheyd/llama-3.1-8b-instruct-no-robots-mlx)
 
-First SFT on Tulu3 dataset:
+## First SFT on Tulu3 dataset:
 
 [llama-3.1-8b-tulu3-sft](https://huggingface.co/aksheyd/llama-3.1-8b-tulu3-sft)
 
 [llama-3.1-8b-tulu3-sft-mlx](https://huggingface.co/aksheyd/llama-3.1-8b-tulu3-sft-mlx)
+
+## Unsloth QLora on FineTome dataset:
+
+[qwen3-32b-finetome-sft](https://huggingface.co/aksheyd/qwen3-32b-finetome-sft)
 
 ## Findings
 

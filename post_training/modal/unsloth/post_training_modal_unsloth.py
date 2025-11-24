@@ -271,6 +271,63 @@ def finetune(config: TrainingConfig):
     return config.experiment_name
 
 
+@app.function(
+    image=train_image,
+    gpu=GPU_TYPE,
+    volumes={
+        "/model_cache": model_cache_volume,
+        "/checkpoints": checkpoint_volume,
+    },
+    secrets=[modal.Secret.from_name("huggingface-secret-write")],
+    timeout=2 * 60 * 60,  # 2 hours for merging and uploading
+)
+def merge_and_upload(
+    experiment_name: str,
+    hf_repo_name: str,
+    max_seq_length: int = 32768,
+):
+    """Merge LoRA adapter weights with base model and upload to Hugging Face Hub."""
+    checkpoint_path = pathlib.Path("/checkpoints") / "experiments" / experiment_name
+    final_model_path = checkpoint_path / "final_model"
+
+    if not final_model_path.exists():
+        raise ValueError(
+            f"Model not found at {final_model_path}. "
+            f"Make sure training completed successfully."
+        )
+
+    print(f"Loading LoRA adapters from: {final_model_path}")
+
+    # Load base model with LoRA adapters
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=str(final_model_path),  # Load base model
+        max_seq_length=max_seq_length,
+        load_in_4bit=True,
+    )
+
+    # Save merged model locally first
+    merged_path = checkpoint_path / "merged_model"
+    merged_path.mkdir(parents=True, exist_ok=True)
+
+    print(f"Saving merged model to {merged_path}...")
+    model.save_pretrained_merged(
+        str(merged_path),
+        tokenizer,
+        save_method="merged_16bit",
+    )
+
+    # Upload to Hugging Face Hub
+    print(f"Uploading merged model to Hugging Face: {hf_repo_name}")
+    model.push_to_hub_merged(
+        hf_repo_name,
+        tokenizer,
+        token=True,
+    )
+
+    print(f"✓ Successfully uploaded to https://huggingface.co/{hf_repo_name}")
+    return hf_repo_name
+
+
 @app.local_entrypoint()
 def main(
     # Model and dataset configuration
@@ -452,3 +509,40 @@ def check_for_existing_checkpoint(paths: dict):
         return str(latest_checkpoint)
 
     return None
+
+
+@app.local_entrypoint()
+def upload(
+    experiment_name: str,
+    base_model_name: str,
+    hf_repo_name: str,
+    max_seq_length: int = 32768,
+):
+    """
+    Upload a trained model to Hugging Face Hub.
+
+    Usage:
+        modal run post_training_modal_unsloth.py::upload \
+            --experiment-name "Qwen3-32B-r16-20240123-120000" \
+            --base-model-name "unsloth/Qwen3-32B" \
+            --hf-repo-name "your-username/your-model-name" \
+            --max-seq-length 32768 \
+            --quantization-method "q4_k_m"  # Optional
+
+    Args:
+        experiment_name: The experiment name from training
+        base_model_name: Base model used for training (e.g., "unsloth/Qwen3-32B")
+        hf_repo_name: Target Hugging Face repo (e.g., "username/model-name")
+        max_seq_length: Maximum sequence length used during training (default: 32768)
+    """
+    print(f"Starting merge and upload for experiment: {experiment_name}")
+    print(f"Base model: {base_model_name}")
+    print(f"Target repository: {hf_repo_name}")
+
+    result = merge_and_upload.remote(
+        experiment_name=experiment_name,
+        hf_repo_name=hf_repo_name,
+        max_seq_length=max_seq_length,
+    )
+
+    print(f"✓ Model successfully uploaded to: https://huggingface.co/{result}")
